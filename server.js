@@ -10,8 +10,24 @@ const auth = require('./src/auth');
 const ssh = require('./src/ssh-sessions');
 
 const PORT = process.env.PORT || 4022;
+const ORIGIN = process.env.APP_ORIGIN || 'https://ssh.morenadoaco.com.br';
 const app = express();
 app.disable('x-powered-by');
+
+// ---------- Headers de segurança (aplicados a todas as respostas) ----------
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data:; connect-src 'self' wss:; manifest-src 'self'; " +
+    "base-uri 'none'; frame-ancestors 'none'; object-src 'none'");
+  next();
+});
+
 app.use(express.json({ limit: '256kb' }));
 
 // ---------- API ----------
@@ -22,6 +38,8 @@ api.get('/state', (req, res) => {
 });
 
 api.post('/setup', (req, res) => {
+  const rl = auth.checkRate(req);
+  if (!rl.ok) return res.status(429).json({ error: `Muitas tentativas. Aguarde ${rl.retryAfter}s.` });
   if (vault.isSetup()) return res.status(400).json({ error: 'Já configurado' });
   try {
     vault.setup(req.body.username, req.body.password);
@@ -32,9 +50,15 @@ api.post('/setup', (req, res) => {
 });
 
 api.post('/login', (req, res) => {
+  const rl = auth.checkRate(req);
+  if (!rl.ok) return res.status(429).json({ error: `Muitas tentativas. Aguarde ${rl.retryAfter}s.` });
   if (!vault.isSetup()) return res.status(400).json({ error: 'Não configurado' });
   try {
-    if (!vault.unlock(req.body.username, req.body.password)) return res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    if (!vault.unlock(req.body.username, req.body.password)) {
+      auth.recordFail(req);
+      return res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    }
+    auth.recordSuccess(req);
     const token = auth.createToken();
     res.setHeader('Set-Cookie', auth.cookieHeader(token));
     res.json({ ok: true });
@@ -89,6 +113,11 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 
 wss.on('connection', (ws, req) => {
+  // Anti-CSWSH: se o navegador mandar Origin, ele precisa ser o nosso domínio.
+  const origin = req.headers.origin;
+  if (origin && origin !== ORIGIN) {
+    return ws.close();
+  }
   // Autenticação via cookie de sessão.
   if (!auth.isValid(auth.getToken(req)) || !vault.isUnlocked()) {
     ws.send(JSON.stringify({ type: 'error', message: 'Não autenticado' }));

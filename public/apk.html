@@ -39,8 +39,8 @@ code{background:#0b0f17;border:1px solid #243047;padding:1px 6px;border-radius:6
   <p class="sub">Seus servidores no bolso, com sessões que ficam vivas mesmo com o app fechado.</p>
 
   <div class="tab">
-    <button id="tab-apk" class="on" onclick="sw('apk')">📱 APK Android</button>
-    <button id="tab-pwa" onclick="sw('pwa')">🌐 Instalar (PWA)</button>
+    <button id="tab-apk" class="on" data-tab="apk">📱 APK Android</button>
+    <button id="tab-pwa" data-tab="pwa">🌐 Instalar (PWA)</button>
   </div>
 
   <div id="pane-apk" class="pane on">
@@ -72,13 +72,6 @@ code{background:#0b0f17;border:1px solid #243047;padding:1px 6px;border-radius:6
     <p class="muted">No iPhone não existe APK — o PWA é o jeito de instalar.</p>
   </div>
 </div>
-<script>
-function sw(w){
-  document.getElementById('tab-apk').classList.toggle('on',w==='apk');
-  document.getElementById('tab-pwa').classList.toggle('on',w==='pwa');
-  document.getElementById('pane-apk').classList.toggle('on',w==='apk');
-  document.getElementById('pane-pwa').classList.toggle('on',w==='pwa');
-}
-</script>
+<script src="/apk.js"></script>
 </body>
 </html>

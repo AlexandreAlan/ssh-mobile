@@ -24,6 +24,44 @@ function destroy(token) {
   if (token) sessions.delete(token);
 }
 
+// ---- Proteção contra força bruta (por IP) ----
+// Após MAX_FAILS tentativas erradas numa janela, bloqueia o IP por BLOCK ms.
+const attempts = new Map(); // ip -> { count, first, blockedUntil }
+const MAX_FAILS = 5;
+const WINDOW = 1000 * 60 * 15;  // 15 min
+const BLOCK = 1000 * 60 * 15;   // bloqueio de 15 min
+
+function clientIp(req) {
+  // Atrás do nginx: o IP real vem em X-Forwarded-For (primeiro da lista).
+  const xff = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return xff || req.socket.remoteAddress || 'unknown';
+}
+
+// Retorna {ok:true} ou {ok:false, retryAfter} se o IP estiver bloqueado.
+function checkRate(req) {
+  const ip = clientIp(req);
+  const rec = attempts.get(ip);
+  const now = Date.now();
+  if (rec && rec.blockedUntil && now < rec.blockedUntil) {
+    return { ok: false, retryAfter: Math.ceil((rec.blockedUntil - now) / 1000) };
+  }
+  return { ok: true };
+}
+
+function recordFail(req) {
+  const ip = clientIp(req);
+  const now = Date.now();
+  let rec = attempts.get(ip);
+  if (!rec || now - rec.first > WINDOW) rec = { count: 0, first: now, blockedUntil: 0 };
+  rec.count++;
+  if (rec.count >= MAX_FAILS) rec.blockedUntil = now + BLOCK;
+  attempts.set(ip, rec);
+}
+
+function recordSuccess(req) {
+  attempts.delete(clientIp(req));
+}
+
 function parseCookies(header) {
   const out = {};
   (header || '').split(';').forEach((part) => {
@@ -40,10 +78,10 @@ function getToken(req) {
 
 const COOKIE = 'sid';
 function cookieHeader(token) {
-  return `${COOKIE}=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${TTL / 1000}`;
+  return `${COOKIE}=${token}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=${TTL / 1000}`;
 }
 function clearCookieHeader() {
-  return `${COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`;
+  return `${COOKIE}=; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=0`;
 }
 
 function requireAuth(req, res, next) {
@@ -57,4 +95,7 @@ setInterval(() => {
   for (const [t, exp] of sessions) if (now > exp) sessions.delete(t);
 }, 1000 * 60 * 60).unref();
 
-module.exports = { createToken, isValid, destroy, getToken, cookieHeader, clearCookieHeader, requireAuth };
+module.exports = {
+  createToken, isValid, destroy, getToken, cookieHeader, clearCookieHeader, requireAuth,
+  checkRate, recordFail, recordSuccess, clientIp,
+};
