@@ -24,7 +24,7 @@ api.get('/state', (req, res) => {
 api.post('/setup', (req, res) => {
   if (vault.isSetup()) return res.status(400).json({ error: 'Já configurado' });
   try {
-    vault.setup(req.body.password);
+    vault.setup(req.body.username, req.body.password);
     const token = auth.createToken();
     res.setHeader('Set-Cookie', auth.cookieHeader(token));
     res.json({ ok: true });
@@ -34,7 +34,7 @@ api.post('/setup', (req, res) => {
 api.post('/login', (req, res) => {
   if (!vault.isSetup()) return res.status(400).json({ error: 'Não configurado' });
   try {
-    if (!vault.unlock(req.body.password)) return res.status(401).json({ error: 'Senha incorreta' });
+    if (!vault.unlock(req.body.username, req.body.password)) return res.status(401).json({ error: 'Usuário ou senha incorretos' });
     const token = auth.createToken();
     res.setHeader('Set-Cookie', auth.cookieHeader(token));
     res.json({ ok: true });

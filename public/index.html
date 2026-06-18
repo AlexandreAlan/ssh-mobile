@@ -22,8 +22,9 @@
     <h1 id="auth-title">SSH morenadoaco</h1>
     <p id="auth-sub" class="muted">Acesso seguro aos seus servidores</p>
     <form id="auth-form">
-      <input type="password" id="auth-pass" placeholder="Senha mestra" autocomplete="current-password" required>
-      <input type="password" id="auth-pass2" placeholder="Confirme a senha mestra" autocomplete="new-password" style="display:none">
+      <input type="text" id="auth-user" placeholder="Usuário" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+      <input type="password" id="auth-pass" placeholder="Senha" autocomplete="current-password" required>
+      <input type="password" id="auth-pass2" placeholder="Confirme a senha" autocomplete="new-password" style="display:none">
       <button type="submit" id="auth-btn">Entrar</button>
     </form>
     <p id="auth-err" class="err"></p>

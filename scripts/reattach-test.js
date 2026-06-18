@@ -19,7 +19,7 @@ function req(method, path, body) {
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
 (async () => {
-  await req('POST', '/api/login', { password: 'senha-de-teste-123' });
+  await req('POST', '/api/login', { username: 'tester', password: 'senha-de-teste-123' });
   const list = (await req('GET', '/api/servers')).json.servers;
   const serverId = list[0].id;
 

@@ -27,17 +27,24 @@ function isSetup() {
   return !!(c && c.passwordHash);
 }
 
+function normUser(u) {
+  return (u || '').trim().toLowerCase();
+}
+
 function isUnlocked() {
   return vaultKey !== null;
 }
 
-// Primeira execução: define a senha mestra e cria o cofre vazio.
-function setup(password) {
+// Primeira execução: define usuário + senha mestra e cria o cofre vazio.
+// O usuário identifica o login; a senha continua sendo a chave que criptografa o cofre.
+function setup(username, password) {
   if (isSetup()) throw new Error('Já configurado');
-  if (!password || password.length < 8) throw new Error('A senha mestra precisa ter ao menos 8 caracteres');
+  username = normUser(username);
+  if (username.length < 3) throw new Error('O usuário precisa ter ao menos 3 caracteres');
+  if (!password || password.length < 8) throw new Error('A senha precisa ter ao menos 8 caracteres');
   ensureDataDir();
   const vaultSalt = crypto.randomBytes(16).toString('hex');
-  const config = { passwordHash: hashPassword(password), vaultSalt, createdAt: new Date().toISOString() };
+  const config = { username, passwordHash: hashPassword(password), vaultSalt, createdAt: new Date().toISOString() };
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), { mode: 0o600 });
   vaultKey = deriveKey(password, Buffer.from(vaultSalt, 'hex'));
   servers = [];
@@ -57,10 +64,11 @@ function importSeed() {
   try { fs.unlinkSync(SEED_PATH); } catch {}
 }
 
-// Verifica senha de login e destrava o cofre em memória.
-function unlock(password) {
+// Verifica usuário + senha de login e destrava o cofre em memória.
+function unlock(username, password) {
   const config = readConfig();
   if (!config) throw new Error('Não configurado');
+  if (normUser(username) !== config.username) return false;
   if (!verifyPassword(password, config.passwordHash)) return false;
   vaultKey = deriveKey(password, Buffer.from(config.vaultSalt, 'hex'));
   loadVault();

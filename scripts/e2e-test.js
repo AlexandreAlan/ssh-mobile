@@ -20,7 +20,7 @@ function req(method, path, body) {
 }
 
 (async () => {
-  let r = await req('POST', '/api/setup', { password: 'senha-de-teste-123' });
+  let r = await req('POST', '/api/setup', { username: 'tester', password: 'senha-de-teste-123' });
   console.log('setup', r.status, r.json);
   const key = fs.readFileSync(process.env.HOME + '/.ssh/id_ed25519', 'utf8');
   r = await req('POST', '/api/servers', { label: 'localhost-test', host: '127.0.0.1', port: 4219, username: process.env.USER, authType: 'key', privateKey: key });

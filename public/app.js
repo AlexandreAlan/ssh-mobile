@@ -28,9 +28,12 @@ async function boot(){
     const st=await api('GET','/state');
     if(st.authenticated){await openList();return;}
     isSetupMode=!st.setup;
-    $('#auth-title').textContent=isSetupMode?'Defina sua senha mestra':'SSH morenadoaco';
-    $('#auth-sub').textContent=isSetupMode?'Ela protege (criptografa) todas as suas credenciais. Não há recuperação — guarde bem.':'Acesso seguro aos seus servidores';
-    $('#auth-pass').placeholder=isSetupMode?'Nova senha mestra (mín. 8)':'Senha mestra';
+    $('#auth-title').textContent=isSetupMode?'Crie seu acesso':'SSH morenadoaco';
+    $('#auth-sub').textContent=isSetupMode?'Escolha usuário e senha. A senha criptografa todas as suas credenciais — não há recuperação, guarde bem.':'Acesso seguro aos seus servidores';
+    $('#auth-user').placeholder=isSetupMode?'Novo usuário (mín. 3)':'Usuário';
+    $('#auth-user').autocomplete=isSetupMode?'username':'username';
+    $('#auth-pass').autocomplete=isSetupMode?'new-password':'current-password';
+    $('#auth-pass').placeholder=isSetupMode?'Nova senha (mín. 8)':'Senha';
     $('#auth-pass2').style.display=isSetupMode?'block':'none';
     $('#auth-btn').textContent=isSetupMode?'Criar e entrar':'Entrar';
     show('view-auth');
@@ -40,15 +43,17 @@ async function boot(){
 $('#auth-form').addEventListener('submit',async(e)=>{
   e.preventDefault();
   $('#auth-err').textContent='';
+  const user=$('#auth-user').value.trim();
   const pass=$('#auth-pass').value;
+  if(!user){$('#auth-err').textContent='Informe o usuário';return;}
   try{
     if(isSetupMode){
       if(pass!==$('#auth-pass2').value){$('#auth-err').textContent='As senhas não conferem';return;}
-      await api('POST','/setup',{password:pass});
+      await api('POST','/setup',{username:user,password:pass});
     }else{
-      await api('POST','/login',{password:pass});
+      await api('POST','/login',{username:user,password:pass});
     }
-    $('#auth-pass').value='';$('#auth-pass2').value='';
+    $('#auth-user').value='';$('#auth-pass').value='';$('#auth-pass2').value='';
     await openList();
   }catch(err){$('#auth-err').textContent=err.message;}
 });
