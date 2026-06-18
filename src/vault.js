@@ -42,6 +42,19 @@ function setup(password) {
   vaultKey = deriveKey(password, Buffer.from(vaultSalt, 'hex'));
   servers = [];
   persist();
+  importSeed();
+}
+
+// Importa servidores pré-cadastrados (data/seed-servers.json) na primeira configuração,
+// e apaga o arquivo em seguida. Permite "deixar salvo" sem conhecer a senha mestra.
+const SEED_PATH = path.join(DATA_DIR, 'seed-servers.json');
+function importSeed() {
+  if (!fs.existsSync(SEED_PATH)) return;
+  try {
+    const seed = JSON.parse(fs.readFileSync(SEED_PATH, 'utf8'));
+    if (Array.isArray(seed)) for (const s of seed) { try { add(s); } catch {} }
+  } catch {}
+  try { fs.unlinkSync(SEED_PATH); } catch {}
 }
 
 // Verifica senha de login e destrava o cofre em memória.
