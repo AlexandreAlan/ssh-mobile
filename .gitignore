@@ -1,0 +1,20 @@
+# Node
+node_modules/
+*.log
+.env
+
+# Cofre de credenciais e dados em runtime (NUNCA versionar)
+data/
+
+# Android / build do APK — segredos e artefatos
+*.keystore
+*.jks
+android-build/keystore.properties
+android-build/local.properties
+android-build/.gradle/
+android-build/build/
+android-build/app/build/
+twa-manifest.json
+
+# APK gerado (é grande; é publicado no servidor, não no repo)
+public/downloads/*.apk

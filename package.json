@@ -1,0 +1,19 @@
+{
+  "name": "ssh-morenadoaco",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cliente SSH mobile (PWA) com sessões persistentes - ssh.morenadoaco.com.br",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "vendor": "node scripts/vendor.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ssh2": "^1.15.0",
+    "ws": "^8.17.0",
+    "@xterm/xterm": "^5.5.0",
+    "@xterm/addon-fit": "^0.10.0"
+  }
+}

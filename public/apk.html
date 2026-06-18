@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f17">
+<title>Instalar · SSH morenadoaco</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#0b0f17;color:#e6ebf5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:calc(28px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));line-height:1.55}
+.wrap{max-width:440px;margin:0 auto}
+.logo{width:76px;height:76px;border-radius:20px;margin:0 auto 18px;
+  background:linear-gradient(135deg,#3b82f6,#22d3ee);display:grid;place-items:center;font-size:38px;
+  box-shadow:0 12px 34px rgba(59,130,246,.4)}
+h1{font-size:24px;text-align:center;margin:0 0 4px}
+.sub{text-align:center;color:#8b97ad;margin:0 0 26px}
+.btn{display:block;text-align:center;text-decoration:none;background:#3b82f6;color:#fff;
+  font-size:17px;font-weight:600;padding:16px;border-radius:14px;margin:10px 0}
+.btn.alt{background:#161d2e;border:1px solid #243047;color:#e6ebf5}
+.card{background:#121826;border:1px solid #243047;border-radius:16px;padding:18px 18px 6px;margin:22px 0}
+.card h2{font-size:15px;margin:0 0 10px;color:#22d3ee}
+ol{margin:0;padding-left:20px}
+li{margin-bottom:9px;font-size:14.5px}
+.muted{color:#8b97ad;font-size:12.5px;word-break:break-all}
+.tab{display:flex;gap:6px;background:#121826;border:1px solid #243047;border-radius:12px;padding:5px;margin-bottom:6px}
+.tab button{flex:1;background:transparent;border:none;color:#8b97ad;padding:11px;border-radius:9px;font-size:14px;font-weight:600;font-family:inherit}
+.tab button.on{background:#3b82f6;color:#fff}
+.pane{display:none}.pane.on{display:block}
+code{background:#0b0f17;border:1px solid #243047;padding:1px 6px;border-radius:6px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">⌘</div>
+  <h1>SSH morenadoaco</h1>
+  <p class="sub">Seus servidores no bolso, com sessões que ficam vivas mesmo com o app fechado.</p>
+
+  <div class="tab">
+    <button id="tab-apk" class="on" onclick="sw('apk')">📱 APK Android</button>
+    <button id="tab-pwa" onclick="sw('pwa')">🌐 Instalar (PWA)</button>
+  </div>
+
+  <div id="pane-apk" class="pane on">
+    <a class="btn" href="/downloads/ssh-morena.apk" download>⬇️ Baixar APK (Android)</a>
+    <div class="card">
+      <h2>Como instalar o APK</h2>
+      <ol>
+        <li>Toque em <b>Baixar APK</b> acima.</li>
+        <li>Abra o arquivo baixado (<code>ssh-morena.apk</code>).</li>
+        <li>O Android vai pedir pra permitir <b>"instalar apps desconhecidos"</b> — toque em <b>Configurações</b> e ative pro seu navegador.</li>
+        <li>Volte e toque em <b>Instalar</b>.</li>
+        <li>Pronto — o ícone <b>SSH Morena</b> aparece na tela inicial. 🎉</li>
+      </ol>
+    </div>
+    <p class="muted">App assinado · SHA-256: 38FF813243E43E9568581E2677014ECF1D97B3FF8083FCC97C2C5F376891FDE3</p>
+  </div>
+
+  <div id="pane-pwa" class="pane">
+    <a class="btn alt" href="/">Abrir o app no navegador</a>
+    <div class="card">
+      <h2>Instalar como PWA (sem APK)</h2>
+      <ol>
+        <li>Abra <code>ssh.morenadoaco.com.br</code> no <b>Chrome</b> (Android) ou <b>Safari</b> (iPhone).</li>
+        <li><b>Android:</b> menu <b>⋮</b> → <b>Adicionar à tela inicial</b> / <b>Instalar app</b>.</li>
+        <li><b>iPhone:</b> botão <b>Compartilhar</b> ⬆️ → <b>Adicionar à Tela de Início</b>.</li>
+        <li>Vira um ícone em tela cheia, igual a um app. ✅</li>
+      </ol>
+    </div>
+    <p class="muted">No iPhone não existe APK — o PWA é o jeito de instalar.</p>
+  </div>
+</div>
+<script>
+function sw(w){
+  document.getElementById('tab-apk').classList.toggle('on',w==='apk');
+  document.getElementById('tab-pwa').classList.toggle('on',w==='pwa');
+  document.getElementById('pane-apk').classList.toggle('on',w==='apk');
+  document.getElementById('pane-pwa').classList.toggle('on',w==='pwa');
+}
+</script>
+</body>
+</html>

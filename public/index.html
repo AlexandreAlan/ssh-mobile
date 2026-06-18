@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SSH Morena">
+<title>SSH · morenadoaco</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="/vendor/xterm.css">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- ===== Tela de login / setup ===== -->
+<section id="view-auth" class="view active">
+  <div class="auth-card">
+    <div class="logo">⌘</div>
+    <h1 id="auth-title">SSH morenadoaco</h1>
+    <p id="auth-sub" class="muted">Acesso seguro aos seus servidores</p>
+    <form id="auth-form">
+      <input type="password" id="auth-pass" placeholder="Senha mestra" autocomplete="current-password" required>
+      <input type="password" id="auth-pass2" placeholder="Confirme a senha mestra" autocomplete="new-password" style="display:none">
+      <button type="submit" id="auth-btn">Entrar</button>
+    </form>
+    <p id="auth-err" class="err"></p>
+  </div>
+</section>
+
+<!-- ===== Lista de servidores ===== -->
+<section id="view-list" class="view">
+  <header class="topbar">
+    <strong>Servidores</strong>
+    <div class="actions">
+      <button id="btn-sessions" class="ghost" title="Sessões ativas">⚡ <span id="sess-count">0</span></button>
+      <button id="btn-add" class="ghost">＋</button>
+      <button id="btn-logout" class="ghost" title="Sair">⏏</button>
+    </div>
+  </header>
+  <div id="server-cards" class="cards"></div>
+  <div id="list-empty" class="empty">
+    <p>Nenhum servidor salvo.</p>
+    <button id="btn-add-2" class="primary">Adicionar servidor</button>
+  </div>
+</section>
+
+<!-- ===== Sessões ativas ===== -->
+<section id="view-sessions" class="view">
+  <header class="topbar">
+    <button id="sess-back" class="ghost">‹</button>
+    <strong>Sessões ativas</strong>
+    <span></span>
+  </header>
+  <div id="session-cards" class="cards"></div>
+  <div id="sessions-empty" class="empty"><p>Nenhuma sessão ativa.</p></div>
+</section>
+
+<!-- ===== Editor de servidor ===== -->
+<section id="view-edit" class="view">
+  <header class="topbar">
+    <button id="edit-back" class="ghost">‹</button>
+    <strong id="edit-title">Novo servidor</strong>
+    <button id="edit-save" class="ghost">Salvar</button>
+  </header>
+  <form id="edit-form" class="form">
+    <label>Nome / apelido</label>
+    <input id="f-label" placeholder="Meu VPS">
+    <div class="row">
+      <div style="flex:2"><label>Host / IP</label><input id="f-host" placeholder="177.7.54.198" required></div>
+      <div style="flex:1"><label>Porta</label><input id="f-port" type="number" value="22"></div>
+    </div>
+    <label>Usuário</label>
+    <input id="f-user" placeholder="root" autocapitalize="off" autocomplete="off">
+    <label>Autenticação</label>
+    <div class="seg">
+      <button type="button" data-auth="password" class="seg-on">Senha</button>
+      <button type="button" data-auth="key">Chave SSH</button>
+    </div>
+    <div id="auth-password">
+      <label>Senha SSH</label>
+      <input id="f-password" type="password" placeholder="••••••• (deixe vazio p/ manter)" autocomplete="off">
+    </div>
+    <div id="auth-key" style="display:none">
+      <label>Chave privada (PEM / OpenSSH)</label>
+      <textarea id="f-key" rows="6" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----" autocapitalize="off" spellcheck="false"></textarea>
+      <label>Passphrase da chave (se houver)</label>
+      <input id="f-passphrase" type="password" placeholder="opcional" autocomplete="off">
+    </div>
+    <button type="button" id="btn-delete" class="danger" style="display:none">Excluir servidor</button>
+    <p id="edit-err" class="err"></p>
+  </form>
+</section>
+
+<!-- ===== Terminal ===== -->
+<section id="view-term" class="view term-view">
+  <header class="topbar term-bar">
+    <button id="term-back" class="ghost">‹</button>
+    <span id="term-title" class="term-title">terminal</span>
+    <span id="term-status" class="dot"></span>
+  </header>
+  <div id="terminal"></div>
+  <div class="keybar" id="keybar">
+    <button data-key="esc">esc</button>
+    <button data-key="tab">tab</button>
+    <button data-key="ctrl" id="k-ctrl">ctrl</button>
+    <button data-key="alt" id="k-alt">alt</button>
+    <button data-seq="[A">↑</button>
+    <button data-seq="[B">↓</button>
+    <button data-seq="[D">←</button>
+    <button data-seq="[C">→</button>
+    <button data-key="ctrlc">^C</button>
+    <button data-key="ctrld">^D</button>
+    <button data-text="~">~</button>
+    <button data-text="/">/</button>
+    <button data-text="|">|</button>
+    <button data-text="-">-</button>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<script src="/vendor/xterm.js"></script>
+<script src="/vendor/addon-fit.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

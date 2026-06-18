@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "br.com.morenadoaco.ssh",
+      "sha256_cert_fingerprints": [
+        "38:FF:81:32:43:E4:3E:95:68:58:1E:26:77:01:4E:CF:1D:97:B3:FF:80:83:FC:C9:7C:2C:5F:37:68:91:FD:E3"
+      ]
+    }
+  }
+]
