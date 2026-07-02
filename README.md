@@ -40,10 +40,15 @@ npm run vendor        # copia o xterm pro /public/vendor (já versionado)
 node server.js        # sobe em http://127.0.0.1:4022
 ```
 
-Na primeira vez, abra o app e **defina a senha mestra** — ela criptografa o cofre.
-Os dados ficam em `data/` (ignorado pelo Git): `config.json` (hash da senha) e `vault.enc` (servidores cifrados).
+Na primeira vez, abra o app e **defina usuário + senha mestra** — o usuário identifica o
+login, a senha continua sendo o que deriva a chave que criptografa o cofre.
+Os dados ficam em `data/` (ignorado pelo Git): `config.json` (usuário + hash da senha) e `vault.enc` (servidores cifrados).
 
 > ⚠️ Não há recuperação de senha mestra: se esquecer, o cofre não abre. (É de propósito.)
+
+Para já começar com conexões salvas, crie `data/seed-servers.json` antes da primeira
+configuração — os servidores são importados pro cofre cifrado assim que a senha mestra
+é definida, e o arquivo seed é apagado.
 
 ## Variáveis de ambiente
 
@@ -76,3 +81,7 @@ via fingerprint SHA-256 do certificado de assinatura.
 - Reinício do servidor **trava o cofre** (exige novo login). Sessões SSH ativas caem nesse caso.
 - Tokens de sessão são aleatórios (32 bytes), HttpOnly, expiram em 30 dias.
 - Sirva **sempre via HTTPS** (cookies e SSH passam por aí).
+- **Anti-força-bruta**: `/login` e `/setup` limitados a 5 tentativas por IP (lockout de 15min).
+- **Headers de segurança** em todas as respostas: CSP, HSTS, X-Frame-Options, nosniff.
+- Cookie de sessão com flag **Secure**.
+- **WebSocket valida `Origin`** (anti-CSWSH — cross-site WebSocket hijacking).
